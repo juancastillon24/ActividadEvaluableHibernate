@@ -16,10 +16,16 @@ public class Main {
         SessionFactory factory = DataProvider.getSessionFactory();
         DataService dataService = new DataService(factory);
 
+        /**
+         * Historia de usuario 1
+         */
         Pelicula newpelicula = new Pelicula();
         newpelicula.setTitulo("Pelicula1");
         dataService.savePelicula(newpelicula);
 
+        /**
+         * Historia de usuario 2
+         */
         String user="user1@example.com";
         List<Opinion> opiniones = dataService.findOpinionByEmail(user);
         System.out.println("Opiniones del usuario: " + user);
@@ -30,6 +36,9 @@ public class Main {
             System.out.println("Puntuacion: " + opinion.getPuntuacion());
         }
 
+        /**
+         * Historia de usuario 3
+         */
         Opinion newOpinion = new Opinion();
         newOpinion.setPelicula(dataService.findPeliculaById(8L).get());
         newOpinion.setDescripcion("Opinion1");
@@ -37,6 +46,9 @@ public class Main {
         newOpinion.setPuntuacion(10);
         dataService.saveOpinion(newOpinion);
 
+        /**
+         * Historia de usuario 4
+         */
         int puntMenorOIgualQue=3;
         List<Opinion> puntMenorList = dataService.findOpinionByPuntuacionMenorQue(puntMenorOIgualQue);
 
@@ -48,11 +60,5 @@ public class Main {
             System.out.println("Puntuacion: " + opinion1.getPuntuacion());
         }
 
-        try (Session session = factory.openSession()) {
-            session.beginTransaction();
-            session.persist(newpelicula);
-            session.persist(newOpinion);
-            session.getTransaction().commit();
-        }
     }
 }
