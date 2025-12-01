@@ -1,17 +1,58 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    static void main() {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        IO.println(String.format("Hello and welcome!"));
+import org.example.models.Opinion;
+import org.example.models.Pelicula;
+import org.example.utils.DataProvider;
+import org.example.utils.DataService;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            IO.println("i = " + i);
+import java.util.List;
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        SessionFactory factory = DataProvider.getSessionFactory();
+        DataService dataService = new DataService(factory);
+
+        Pelicula newpelicula = new Pelicula();
+        newpelicula.setTitulo("Pelicula1");
+        dataService.savePelicula(newpelicula);
+
+        String user="user1@example.com";
+        List<Opinion> opiniones = dataService.findOpinionByEmail(user);
+        System.out.println("Opiniones del usuario: " + user);
+        for (Opinion opinion : opiniones) {
+            System.out.println("------------------------------------------------------");
+            System.out.println("Pelicula:" + opinion.getPelicula().getTitulo());
+            System.out.println("Descripcion: " + opinion.getDescripcion());
+            System.out.println("Puntuacion: " + opinion.getPuntuacion());
+        }
+
+        Opinion newOpinion = new Opinion();
+        newOpinion.setPelicula(dataService.findPeliculaById(8L).get());
+        newOpinion.setDescripcion("Opinion1");
+        newOpinion.setUsuario("Juan");
+        newOpinion.setPuntuacion(10);
+        dataService.saveOpinion(newOpinion);
+
+        int puntMenorOIgualQue=3;
+        List<Opinion> puntMenorList = dataService.findOpinionByPuntuacionMenorQue(puntMenorOIgualQue);
+
+        System.out.println("Opiniones con puntuacion menor o igual que " + puntMenorOIgualQue + ":");
+        for (Opinion opinion1 : puntMenorList) {
+            System.out.println("------------------------------------------------------");
+            System.out.println("Pelicula:" + opinion1.getPelicula().getTitulo());
+            System.out.println("Descripcion: " + opinion1.getDescripcion());
+            System.out.println("Puntuacion: " + opinion1.getPuntuacion());
+        }
+
+        try (Session session = factory.openSession()) {
+            session.beginTransaction();
+            session.persist(newpelicula);
+            session.persist(newOpinion);
+            session.getTransaction().commit();
         }
     }
 }
